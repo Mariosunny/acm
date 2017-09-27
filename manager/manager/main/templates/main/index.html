@@ -1,0 +1,230 @@
+{% load static %}
+<html ng-app="app">
+<head>
+	<title>ACM-TAMUK Manager</title>
+
+	<script src="{% static 'js/jquery.js' %}"></script>
+	<script src="{% static 'js/angular.js' %}"></script>
+	<script src="{% static 'js/init.js' %}"></script>
+	<script src="{% static 'js/ajax.js' %}"></script>
+	<script src="{% static 'js/main.js' %}"></script>
+	<script src="{% static 'js/members.js' %}"></script>
+	<script src="{% static 'js/inventory.js' %}"></script>
+
+	<link rel="stylesheet" href="{% static 'css/normalize.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/index.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/members.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/table.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/footer.css' %}"/>
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+{% verbatim %}
+<body ng-controller="main">
+	<nav id="tabs" class="no-select">
+		<div class="tab no-" ng-click="selectedPage = 'members'" ng-class="{'selected-tab': selectedPage == 'members'}">
+			Members
+		</div>
+		<div class="tab" ng-click="selectedPage = 'teams'" ng-class="{'selected-tab': selectedPage == 'teams'}">
+			Teams
+		</div>
+		<div class="tab" ng-click="selectedPage = 'roles'" ng-class="{'selected-tab': selectedPage == 'roles'}">
+			Roles
+		</div>
+		<div class="tab" ng-click="selectedPage = 'inventory'" ng-class="{'selected-tab': selectedPage == 'inventory'}">
+			Inventory
+		</div>
+		<div class="tab" ng-click="selectedPage = 'tasks'" ng-class="{'selected-tab': selectedPage == 'tasks'}">
+			Tasks
+		</div>
+		<div class="tab" ng-click="selectedPage = 'files'" ng-class="{'selected-tab': selectedPage == 'files'}">
+			Files
+		</div>
+	</nav>
+	<div id="content">
+		<div class="page padded-page" id="members-page" ng-show="selectedPage == 'members'" ng-controller="members">
+			<div class="page-element">
+				<span ng-click="selectedList = 'members'" ng-class="{'list-unselected': selectedList == 'mailing'}">Members List</span> / <span ng-click="selectedList = 'mailing'" ng-class="{'list-unselected': selectedList == 'members'}">Mailing List</span>
+			</div>
+			<div ng-show="selectedList == 'members'">
+				<div class="page-element">
+					<button ng-click="addMember = !addMember">
+						<span ng-if="!addMember">Add member...</span>
+						<span ng-if="addMember">Close</span>
+					</button>
+				</div>
+				<table ng-show="addMember" class="form">
+					<tr>
+						<td>First name:</td>
+						<td><input ng-model="firstName" type="text" size="20" /></td>
+					</tr>
+					<tr>
+						<td>Last name:</td>
+						<td><input ng-model="lastName" type="text" size="20" /></td>
+					</tr>
+					<tr>
+						<td>Email:</td>
+						<td><input ng-model="email" type="text" size="30" /></td>
+					</tr>
+					<tr>
+						<td>ACM number:</td>
+						<td><input ng-model="ACMnumber" type="text" size="10" /></td>
+					</tr>
+					<tr>
+						<td>Classification:</td>
+						<td>
+							<select ng-model="classification" ng-init="classification = 0">
+								<option value="0" selected>Student</option>
+								<option value="1">Faculty</option>
+								<option value="2">Other</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button ng-click="newMember()">Submit</button>
+						</td>
+					</tr>
+				</table>
+				<hr/>
+				<div class="page-element">
+					<input ng-model="searchInput" ng-change="search()" type="text" placeholder="Search members..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" select-on-click size="25" />
+
+				</div>
+				<div class="page-element">
+					<table class="table" class="no-select">
+						<th><input type="checkbox" ng-model="inputSelectAll" ng-change="selectAll()" /></th>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>ACM Number</th>
+						<th>Email</th>
+						<th>Classification</th>
+						<th>Role</th>
+						<tr ng-repeat="member in members" ng-class="{'table-row-selected': isSelected(member)}" ng-click="select(member)" ng-hide="isHidden(member)">
+							<td>
+								<input ng-model="inputSelect" ng-checked="isSelected(member)" ng-change="select(member)" type="checkbox"/>
+							</td>
+							<td>
+								{{member.firstName}}
+							</td>
+							<td>
+								{{member.lastName}}
+							</td>
+							<td>
+								{{member.ACMnumber}}
+							</td>
+							<td>
+								{{member.email}}
+							</td>
+							<td>
+								{{member.classification.name}}
+							</td>
+							<td>
+								{{member.role.toString()}}
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div ng-show="selectedList == 'mailing'">
+					mailing
+				</div>
+			</div>
+			<div id="footer" ng-show="selectedMembers.length > 0">
+				<div class="page-element">
+					<span style="font-weight: bold;">({{selectedMembers.length}}) members selected.</span>
+				</div>
+				<div class="page-element">
+					{{getSelectedMembersList()}}
+				</div>
+				<div class="page-element">
+					{{getSelectedMembersEmailList()}}
+				</div>
+				<div class="page-element">
+					<button>Email all</button>
+					<button ng-click="removeAll()">Remove all</button>
+				</div>
+				<div class="page-element">
+					<div class="availability-table no-select">
+						<div class="availability-table-row availability-table-header">
+							<div class="availability-table-cell availability-table-cell-mwf"></div>
+							<div class="availability-table-cell availability-table-cell-mwf">8-9</div>
+							<div class="availability-table-cell availability-table-cell-mwf">9-10</div>
+							<div class="availability-table-cell availability-table-cell-mwf">10-11</div>
+							<div class="availability-table-cell availability-table-cell-mwf">11-12</div>
+							<div class="availability-table-cell availability-table-cell-mwf">12-1</div>
+							<div class="availability-table-cell availability-table-cell-mwf">1-2</div>
+							<div class="availability-table-cell availability-table-cell-mwf">2-3</div>
+							<div class="availability-table-cell availability-table-cell-mwf">3-4</div>
+							<div class="availability-table-cell availability-table-cell-mwf">4-5</div>
+							<div class="availability-table-cell availability-table-cell-mwf">5-6</div>
+							<div class="availability-table-cell availability-table-cell-mwf">6-7</div>
+							<div class="availability-table-cell availability-table-cell-mwf">7-8</div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">S</div>
+							<div ng-click="selectTimeslot(0, i)" class="availability-table-cell availability-table-cell-mwf" ng-style="{'background-color': getTimeslotColor(0, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" title="{{getTimeslotTitle(0, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(0, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">M</div>
+							<div ng-click="selectTimeslot(1, i)" class="availability-table-cell availability-table-cell-mwf" ng-style="{'background-color': getTimeslotColor(1, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" title="{{getTimeslotTitle(1, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(1, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">T</div>
+							<div ng-click="selectTimeslot(2, i)" class="availability-table-cell availability-table-cell-tr" ng-style="{'background-color': getTimeslotColor(2, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7]" title="{{getTimeslotTitle(2, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(2, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">W</div>
+							<div ng-click="selectTimeslot(3, i)" class="availability-table-cell availability-table-cell-mwf" ng-style="{'background-color': getTimeslotColor(3, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" title="{{getTimeslotTitle(3, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(3, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">R</div>
+							<div ng-click="selectTimeslot(4, i)" class="availability-table-cell availability-table-cell-tr" ng-style="{'background-color': getTimeslotColor(4, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7]" title="{{getTimeslotTitle(4, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(4, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">F</div>
+							<div ng-click="selectTimeslot(5, i)" class="availability-table-cell availability-table-cell-mwf" ng-style="{'background-color': getTimeslotColor(5, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" title="{{getTimeslotTitle(5, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(5, i)}}</span></div>
+						</div>
+						<div class="availability-table-row">
+							<div class="availability-table-cell availability-table-header">S</div>
+							<div ng-click="selectTimeslot(6, i)" class="availability-table-cell availability-table-cell-mwf" ng-style="{'background-color': getTimeslotColor(6, i)}" ng-repeat="i in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]" title="{{getTimeslotTitle(6, i)}}"><span ng-if="!isTimeslotCountHidden">{{getTimeslotCount(6, i)}}</span></div>
+						</div>
+					</div>
+					<table class="form">
+						<tr>
+							<td>Hide numbers </td>
+							<td><input type="checkbox" ng-click="isTimeslotCountHidden = !isTimeslotCountHidden"/></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div class="page padded-page" id="teams-page" ng-show="selectedPage == 'teams'">
+			
+		</div>
+		<div class="page padded-page" id="roles-page" ng-show="selectedPage == 'roles'">
+			roles
+		</div>
+		<div class="page padded-page" id="inventory-page" ng-show="selectedPage == 'inventory'" ng-controller="inventory">
+			<table class="table" class="no-select">
+				<th>Item</th>
+				<th>Quantity</th>
+				<tr ng-repeat="item in items">							
+					<td>
+					{{item.name}}
+					</td>
+					<td>
+					{{item.quantity}}
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="page padded-page" id="tasks-page" ng-show="selectedPage == 'tasks'">
+			tasks
+		</div>
+		<div class="page" id="files-page" ng-show="selectedPage == 'files'">
+			<iframe src="https://drive.google.com/embeddedfolderview?id=0B94Xhh69RXhJMkN5N3hwZmRUWVE#list"></iframe>
+		</div>
+	</div>
+</body>
+</html>
+{% endverbatim %}

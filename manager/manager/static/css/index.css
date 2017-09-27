@@ -1,0 +1,67 @@
+body {
+	font-size: 14px;
+	font-family: 'Roboto', sans-serif;
+	position: relative;
+}
+table {
+	font-size: 14px;
+	font-family: 'Roboto', sans-serif;
+}
+#tabs {
+	display: flex;
+	width: 100%;
+	background-color: #ddd;
+	cursor: default;
+}
+.tab {
+	flex: 1;
+	padding: 5px;
+	background-color: #eee;
+	text-align: center;
+	border-bottom: 1px solid #bbb;
+}
+.tab:not(:last-child) {
+	border-right: 1px solid #bbb;
+}
+.selected-tab {
+	border-bottom: 1px solid #fff;
+	background-color: #fff;
+}
+.page {
+	display: hidden;
+	margin-top: 10px;
+}
+.padded-page {
+	padding: 5px;
+}
+h1 {
+	padding: 0;
+	margin: 0;
+	font-size: 20px;
+	font-weight: bold;
+}
+input {
+	display: block;
+}
+.page-element {
+	margin-bottom: 5px;
+}
+.no-select {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+button {
+	cursor: pointer;
+	padding: 2px 5px 2px 5px;
+}
+input[type=text] {
+	padding: 2px;
+}
+.form td:first-child{
+	font-weight: bold;
+	padding-right: 10px;
+}

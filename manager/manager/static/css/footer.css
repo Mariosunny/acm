@@ -1,0 +1,10 @@
+#footer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	border-top: 1px solid #000;
+	background-color: white;
+	padding: 5px;
+	box-shadow: 0 -5px 25px -5px #999;
+}
