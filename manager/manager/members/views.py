@@ -18,8 +18,8 @@ def init(request):
 			"availability_table": member.decode_availability_table()
 			})
 
-	roles = role.name in models.Role.objects.all()
-	classifications = classification.name in models.Classification.objects.all()
+	roles = [{"name": role.name} for role in models.Role.objects.all()]
+	classifications = [{"name": classification.name} for classification in models.Classification.objects.all()]
 
 	return JsonResponse({
 		"members": members,

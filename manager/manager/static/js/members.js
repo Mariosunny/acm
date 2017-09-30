@@ -2,28 +2,60 @@
 
 	var URL_PREFIX = "members";
 
-	function Member(firstName, lastName, ACMnumber, email, role, classification, table) {
+	var Role = {
+		fields: {
+			name: new CharField()
+		},
+		find: function(name) {
 
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.fullName = firstName + " " + lastName;
-		this.ACMnumber = ACMnumber;
-		this.email = email;
-		this.role = role;
-		this.classification = classification;
-		this.table = table;
-	}
+			return roles.find(function(role) {
+				role.name == name;
+			});
+		}
+	};
 
-	function Role(name, displayName) {
+	inherit(Model, Role);
+	
+	Role.prototype.toString = function() {
 
-		this.name = name;
-		this.displayName = displayName || name;
-	}
+		return this.displayName;
+	};
 
-	function Classification(name) {
+	var Classification = {
+		fields: {
+			name: new CharField()
+		},
+		find: function(name) {
 
-		this.name = name;
-	}
+			return classifications.find(function(classification) {
+				classification.name == name;
+			});
+		}
+	};
+
+	inherit(Model, Classification);
+
+	var Member = {
+		fields: {
+			firstName: new CharField(),
+			lastName: new CharField(),
+			ACMnumber: new CharField(),
+			email: new CharField(),
+			role: new ObjectField(Role),
+			classification: new ObjectField(Classification)
+		}
+	};
+
+	inherit(Model, Member);
+
+	var roles, classifications, members;
+
+	ajax(["init"], function(data) {
+
+		roles = Role.loadList(data.roles);
+		classifications = Classification.loadList(data.classifications);
+		members = Member.loadList(data.members);
+	});
 
 	function AvailabilityTable(days) {
 
@@ -45,30 +77,6 @@
 		}
 	}
 
-	Role.prototype.toString = function() {
-
-		return this.displayName;
-	}
-
-	var roles = [
-		new Role("Chair"),
-		new Role("Vice Chair"),
-		new Role("PR Officer"),
-		new Role("Secretary"),
-		new Role("Treasurer"),
-		new Role("Advisor"),
-		new Role("Member", "-")
-	];
-
-	var DEFAULT_ROLE = roles[6];
-
-	var classifications = [
-		new Classification("Student"),
-		new Classification("Faculty"),
-		new Classification("Other")
-	];
-
-	var members = [];
 
 	function ajax(url, callback) {
 
@@ -289,28 +297,6 @@
 			return names.join(", ");
 		};
 	});
-
-	ajax(["init"], function(data) {
-
-		loadRoles(data.roles);
-		loadClassifications(data.classifications);
-		loadMembers(data.members);
-
-		for(var i = 0; i < membersData.length; i++) {
-
-
-		}
-	});
-
-	function loadRoles(data) {
-
-		for(var i = 0; i < data.length; i++) {
-
-			var r = data[i];
-
-			roles.push(new Role(r.name, r.displayName))
-		}
-	}
 
 	return {
 

@@ -1,0 +1,35 @@
+{% load static %}
+<html ng-app="app">
+<head>
+	<title>Team Picker</title>
+
+	<script src="{% static 'js/jquery.js' %}"></script>
+	<script src="{% static 'js/angular.js' %}"></script>
+
+	<script src="{% static 'js/main.js' %}"></script>
+
+	<link rel="stylesheet" href="{% static 'css/normalize.css' %}"/>
+	<link rel="stylesheet" href="{% static 'css/index.css' %}"/>
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+<body ng-controller="main" data-UID="{{UID}}">
+{% verbatim %}
+<h1>HackTX 2017 Teams</h1>
+<h3><span style="color:red;">{{getSelf().name}}</span> - Select a team (2-5 students per team)</h3>
+<div class="container">
+	<div class="row">
+		<div class="team" ng-click="changeTeam(team)" ng-repeat="team in teams" ng-class="{'selectable': !team.isFull()}">
+			<div class="team-name">{{team.name}}</div>
+			<div class="team-member" ng-repeat="member in team.members" ng-class="{'self': isSelf(member)}">
+				{{member.name}}
+			</div>
+			<div class="team-member" ng-repeat="i in repeat(5 - team.members.length)">
+				<i style="color:#bbb;">&nbsp;</i>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+{% endverbatim %}
